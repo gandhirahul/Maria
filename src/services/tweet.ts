@@ -1,45 +1,54 @@
-import { AxiosResponse } from 'axios'
-import baseApi, { BaseApi } from './baseApi'
+import { AxiosResponse } from "axios";
+import baseApi, { BaseApi } from "./baseApi";
 
 export interface TweetModel {
-    readonly id: string;
-    readonly image: string;
-    readonly text: string;
-    readonly timeStamp: number;
-    readonly username: string;
+  readonly id: string;
+  readonly image: string;
+  readonly text: string;
+  readonly timeStamp: number;
+  readonly username: string;
 }
 
-const TWEET_COUNT_PER_REQUEST = 10
+const TWEET_COUNT_PER_REQUEST = 10;
 
 class TweetService {
-    public tweetCount: number
-    private api: BaseApi
+  public tweetCount: number;
+  private api: BaseApi;
 
-    constructor(api: BaseApi) {
-        this.api = api
-        this.tweetCount = TWEET_COUNT_PER_REQUEST
-    }
+  constructor(api: BaseApi) {
+    this.api = api;
+    this.tweetCount = TWEET_COUNT_PER_REQUEST;
+  }
 
-    public getLatestTweets(): Promise<TweetModel[]> {
-        const url = '/api?count=' + this.tweetCount
+  public getLatestTweets(): Promise<TweetModel[]> {
+    const url = "/api?count=" + this.tweetCount; //shouldn't be called when you scroll to top.
 
-        return this.api.getWithRetry<TweetModel[]>(url)
-            .then((res: AxiosResponse) => {
-                return res.data
-            }) 
-    }
+    return this.api
+      .getWithRetry<TweetModel[]>(url)
+      .then((res: AxiosResponse) => {
+        return res.data;
+      });
+  }
 
-    public getTweetsCreatedAfterTime(timeStamp: number): Promise<TweetModel[]> {
-        const url = '/api?count=' + this.tweetCount + '&afterTime=' + timeStamp
+  public getTweetsCreatedAfterTime(timeStamp: number): Promise<TweetModel[]> {
+    const url = "/api?count=" + this.tweetCount + "&afterTime=" + timeStamp;
 
-        return this.api.getWithRetry<TweetModel[]>(url)
-            .then((res: AxiosResponse) => res.data ) 
-    }
+    return this.api
+      .getWithRetry<TweetModel[]>(url)
+      .then((res: AxiosResponse) => res.data);
+  }
 
-    public resetDB() {
-        return this.api.get('/reset')
-    }
+  public getTweetsBeforeAfterTime(timeStamp: number): Promise<TweetModel[]> {
+    const url = "/api?count=" + this.tweetCount + "&beforeTime=" + timeStamp;
 
+    return this.api
+      .getWithRetry<TweetModel[]>(url)
+      .then((res: AxiosResponse) => res.data);
+  }
+
+  public resetDB() {
+    return this.api.get("/reset");
+  }
 }
 
-export const tweetService = new TweetService(baseApi)
+export const tweetService = new TweetService(baseApi);
